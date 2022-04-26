@@ -1,2 +1,2 @@
-# Lab 1 repository: Machine Learning Project Management
+# Lab 2 repository: Machine Learning Project Management
 
