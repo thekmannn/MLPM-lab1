@@ -72,7 +72,7 @@ for fileID in tqdm(MLENDHW_df.index):
 
 
 print('    Splitting dataset into train and test datasets')
-X_train, X_test, y_train, y_test = train_test_split(np.array(X), np.array(y), test_size=0.3, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(np.array(X), np.array(y), test_size=0.2, random_state=42)
 
 
 print('    Saving data to file')
