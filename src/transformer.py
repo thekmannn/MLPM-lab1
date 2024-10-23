@@ -7,6 +7,7 @@ import librosa
 from sklearn.model_selection import train_test_split
 
 from tqdm import tqdm
+import os
 
 from config import *
 
@@ -39,13 +40,26 @@ for file in files:
     MLENDHW_table.append([file_name,participant_ID,interpretation_type, song])
 MLENDHW_df = pd.DataFrame(MLENDHW_table,columns=['file_id','participant','interpretation','song']).set_index('file_id') 
 
+# print(MLENDHW_df)
+# for f in MLENDHW_df.index:
+#    print(f)
+   
 
 print('    Extracting audio features')
 X,y =[],[]
 for fileID in tqdm(MLENDHW_df.index):
     yi = MLENDHW_df.loc[fileID]['interpretation']=='hum'
     fs = None 
-    x, fs = librosa.load(os.path.join(DATA_PATH, fileID),sr=fs)
+
+    # bug fixing
+    # if os.path.exists(fileID):
+    #    print(f"{fileID} exists!")
+    # else:
+    #    print(f"{fileID} not found!")
+    # print(os.path.join(DATA_PATH, fileID))
+
+
+    x, fs = librosa.load(fileID,sr=fs)
     if SCALE_AUDIO: x = x/np.max(np.abs(x))
     f0, voiced_flag = getPitch(x,fs,winLen=0.02)
       
