@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 
 from tqdm import tqdm
 import os
+import csv
 
 from config import *
 
@@ -40,24 +41,12 @@ for file in files:
     MLENDHW_table.append([file_name,participant_ID,interpretation_type, song])
 MLENDHW_df = pd.DataFrame(MLENDHW_table,columns=['file_id','participant','interpretation','song']).set_index('file_id') 
 
-# print(MLENDHW_df)
-# for f in MLENDHW_df.index:
-#    print(f)
-   
 
 print('    Extracting audio features')
 X,y =[],[]
 for fileID in tqdm(MLENDHW_df.index):
     yi = MLENDHW_df.loc[fileID]['interpretation']=='hum'
     fs = None 
-
-    # bug fixing
-    # if os.path.exists(fileID):
-    #    print(f"{fileID} exists!")
-    # else:
-    #    print(f"{fileID} not found!")
-    # print(os.path.join(DATA_PATH, fileID))
-
 
     x, fs = librosa.load(fileID,sr=fs)
     if SCALE_AUDIO: x = x/np.max(np.abs(x))
@@ -68,19 +57,17 @@ for fileID in tqdm(MLENDHW_df.index):
 
     xi = [power, voiced_fr]
     X.append(xi)
-    y.append(yi)
+    y.append(yi*1)
 
 
-print('    Splitting dataset into train and test datasets')
-X_train, X_test, y_train, y_test = train_test_split(np.array(X), np.array(y), test_size=0.2, random_state=42)
+# Saving the extracted features locally
+with open(X_PATH, 'w', newline='') as file:
+    csv.writer(file).writerows(X)
 
-
-print('    Saving data to file')
-np.savetxt(X_TRAIN_PATH, X_train, delimiter=",")
-np.savetxt(X_TEST_PATH, X_test, delimiter=",")
-np.savetxt(Y_TRAIN_PATH, y_train, delimiter=",")
-np.savetxt(Y_TEST_PATH, y_test, delimiter=",")
+# Saving the labels locally
+with open(Y_PATH, 'w', newline='') as file:
+    csv.writer(file).writerows([[value] for value in y])
 
 
 executionTime = (time.time() - startTime)
-print('Execution time in seconds: ' + str(executionTime))
+print('Execution time for the transformation process in seconds: ' + str(executionTime))
